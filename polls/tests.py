@@ -101,7 +101,8 @@ class QuestionIndexViewTests(TestCase):
         """
         The questions index page may display multiple questions.
         """
-        question1 = create_question(question_text="Past question 1.", days=-30)
+        question1 = create_question(question_text="Past question 1.", 
+                                    days=-30)
         question2 = create_question(question_text="Past question 2.", days=-5)
         response = self.client.get(reverse("polls:index"))
         self.assertQuerySetEqual(
