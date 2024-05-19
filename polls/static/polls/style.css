@@ -1,4 +1,4 @@
-li a {
+a {
     color: green;
 }
 
@@ -6,3 +6,19 @@ body {
     background: white url("images/background.webp") no-repeat;
 }
 
+nav ul {
+    list-style-type: none; /* Remove bullet points */
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+nav li {
+    float: left; /* Horizontal nav items */
+}
+
+nav li a {
+    display: block;
+    padding: 10px;
+    text-decoration: none; /* Remove underline */
+}
