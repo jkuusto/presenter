@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Home - Presenter</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'presenter/style.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Presenter</h1>
+    </header>
+
+    <main>
+        <p>
+            This web site features a demo app that showcases five security flaws.
+        </p>
+        <p>
+            <a href="{% url 'polls:index' %}">Please use this link to access the Polls app.</a>
+        </p>
+    </main>
+
+    <footer>
+    </footer>
+</body>
+</html>
