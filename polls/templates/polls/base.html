@@ -14,6 +14,13 @@
             <ul>
                 <li><a href="{% url 'home' %}">Home</a></li>
                 <li><a href="{% url 'polls:index' %}">Polls</a></li>
+                <li>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'polls:logout' %}">Logout {{ user.username }}</a>
+                    {% else %}
+                        <a href="{% url 'polls:auth' %}">Login</a>
+                    {% endif %}
+                </li>
             </ul>
         </nav>
     </header>
