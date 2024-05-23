@@ -15,4 +15,13 @@ Polls Main
     {% else %}
         <p>No polls are available.</p>
     {% endif %}
+
+    <hr>
+
+    <h2> Add New Poll</h2>
+    <form method="post">
+        {{ form.as_p }}
+        <button type="submit">Add question</button>
+    </form>
+
 {% endblock %}

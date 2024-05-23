@@ -4,11 +4,12 @@ from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.contrib import messages
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
-from .forms import UserRegisterForm
+from django.views.decorators.csrf import csrf_exempt
+
+from .forms import UserRegisterForm, QuestionForm, ChoiceForm
 
 from .models import Question, Choice
 
@@ -25,8 +26,22 @@ class IndexView(generic.ListView):
         return (Question.objects.filter(pub_date__lte=timezone.now())
                 .order_by("-pub_date")[:5])
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = QuestionForm()
+        return context
+    
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+            question = form.save(commit=False)
+            question.pub_date = timezone.now()  # set pub_date to current time
+            question.save()
+            return redirect('polls:index')
+        return render(request, self.template_name, {'form': form})
 
-@method_decorator(login_required, name='dispatch')
+
 class DetailView(generic.DetailView):
     model = Question
     template_name = "polls/detail.html"
@@ -36,13 +51,31 @@ class DetailView(generic.DetailView):
         Excludes any questions that aren't published yet.
         """
         return Question.objects.filter(pub_date__lte=timezone.now())
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = ChoiceForm()
+        return context
     
+    @method_decorator(csrf_exempt)
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        form = ChoiceForm(request.POST)
+        if form.is_valid():
+            choice = form.save(commit=False)
+            choice.question = self.get_object()
+            choice.save()
+            return redirect('polls:detail', pk=self.get_object().pk)
+        return render(request, self.template_name, {'form': form, 'question': self.get_object()})
+
 
 class ResultsView(generic.DetailView):
     model = Question
     template_name = "polls/results.html"
 
 
+@csrf_exempt
+@login_required
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     try:

@@ -6,7 +6,7 @@ Detail - {{ question.question_text }}
 
 {% block content %}
     <form action="{% url 'polls:vote' question.id %}" method="post">
-        {% csrf_token %}
+        <!-- {% csrf_token %} -->
         <fieldset>
             <legend><h2>{{ question.question_text }}</h2></legend>
             {% if error_message %}
@@ -20,4 +20,15 @@ Detail - {{ question.question_text }}
         </fieldset>
         <input type="submit" value="vote">
     </form>
+
+    <hr>
+
+    <h2>Add New Choice</h2>
+
+    <form method="post">
+        <!-- {% csrf_token %} -->
+        {{ form.as_p }}
+        <button type="submit">Add choice</button>
+    </form>
+
 {% endblock %}
