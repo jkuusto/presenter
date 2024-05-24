@@ -29,7 +29,7 @@ Cross-Site Request Forgery (CSRF) is an attack that forces an end user to execut
 - The malicious site contains a form that auto-submits a request to the polling application, using the victim's authenticated session.
 The polling application processes the request as if it were initiated by the victim. The threat actor may want to manipulate the results of a poll by casting votes without the users' knowledge or they may want to introduce inappropriate or misleading choices to an existing poll question.
 
-Here is an example where the threat actor has tricker the victim to click a link to a site where the victim's authentication is used to automatically vote for choice 1: 
+Here is an example where the threat actor has tricked the victim to click a link to a site where the victim's authentication is abused to vote for choice 1 automatically: 
 ```
 <form action="http://localhost:8000/polls/1/vote/" method="post" id="snkeakyForm">
     <input type="hidden" name="choice" value="1">
@@ -50,15 +50,15 @@ Enable ```'django.middleware.csrf.CsrfViewMiddleware'``` middleware in settings.
 - detail.html | second form
 
 **description of flaw 2**<br>
-A threat actor can exploit unsanitized SQL handling to inject SQL statements in a user form. This vulnerability allows an attacker to execute arbitrary SQL commands by manipulating input data.
+A threat actor can exploit unsanitized SQL handling to inject SQL statements via user forms. In other words, this vulnerability allows the attacker to execute arbitrary SQL commands by manipulating input data.
 
-Example: The threat actor uses the choice creator form to make a new choice while setting a desired vote tally. This injection payload would create a choice "A thousand votes" and set the vote tally to 1000:
+Example: The threat actor uses the choice creator form to make a new choice while setting an arbitrary vote tally. This injection payload would create a choice "A thousand votes" and set its vote tally to 1000:
 ```
 A thousand votes', 1000); --
 ```
 **how to fix it**
 1. Use Django Forms for input Handling:
-- In detail.html, instead of the default html form, use ```{{ form.as_p }}``` to make use of Django's form rendering providing built-in protection against SQL injection.
+- In detail.html, instead of the default html form, use ```{{ form.as_p }}``` to make use of Django's form rendering which provides built-in protection against SQL injection.
 2. Use Django's ORM for Database Operations:
 - Modify the post method in views.py to use Django's ORM (Object-Relational Mapping), which automatically escapes input data to prevent SQL injection:
 ```
