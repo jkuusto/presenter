@@ -1,3 +1,4 @@
+from django.db import connection
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -7,7 +8,6 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
-from django.views.decorators.csrf import csrf_exempt
 
 from .forms import UserRegisterForm, QuestionForm, ChoiceForm
 
@@ -57,15 +57,19 @@ class DetailView(generic.DetailView):
         context['form'] = ChoiceForm()
         return context
     
-    @method_decorator(csrf_exempt)
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
         form = ChoiceForm(request.POST)
         if form.is_valid():
-            choice = form.save(commit=False)
+            '''choice = form.save(commit=False)
             choice.question = self.get_object()
             choice.save()
-            return redirect('polls:detail', pk=self.get_object().pk)
+            return redirect('polls:detail', pk=self.get_object().pk)'''
+            choice_text = form.cleaned_data['choice_text']
+            question_id = self.get_object().id
+            with connection.cursor() as cursor:
+                cursor.execute(f"INSERT INTO polls_choice (question_id, choice_text, votes) VALUES ({question_id}, '{choice_text}', 0)")
+            return redirect('polls:detail', pk=question_id)
         return render(request, self.template_name, {'form': form, 'question': self.get_object()})
 
 
@@ -74,7 +78,6 @@ class ResultsView(generic.DetailView):
     template_name = "polls/results.html"
 
 
-@csrf_exempt
 @login_required
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)

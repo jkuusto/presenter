@@ -27,7 +27,8 @@ Detail - {{ question.question_text }}
 
     <form method="post">
         <!-- {% csrf_token %} -->
-        {{ form.as_p }}
+        <input type="text" name="choice_text" placeholder="Enter your choice">
+        <!-- {{ form.as_p }} -->
         <button type="submit">Add choice</button>
     </form>
 
