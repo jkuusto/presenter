@@ -21,6 +21,7 @@ Coming soon.
 - detail.html | <!-- {% csrf_token %} -->
 - auth.html | <!-- {% csrf_token %} -->
 - settings.py | # 'django.middleware.csrf.CsrfViewMiddleware',
+<br>
 **description of flaw 1**<br>
 Cross-Site Request Forgery (CSRF) is an attack that forces an end user to execute unwanted actions on the application where they are logged in. This is because the app does not verify the request's origin.
 - The victim is logged into the polling application and has a valid session with the site.
@@ -46,6 +47,7 @@ Enable 'django.middleware.csrf.CsrfViewMiddleware' middleware in settings.py and
 **exact source link pinpointing flaw 2**
 - views.py | class DetailView | def post
 - detail.html | second form
+<br>
 **description of flaw 2**<br>
 A threat actor can exploit unsanitized SQL handling to inject SQL statements in a user form. This vulnerability allows an attacker to execute arbitrary SQL commands by manipulating input data.<br>
 Example: The threat actor uses the choice creator form to make a new choice while setting a desired vote tally. This injection payload would create a choice "A thousand votes" and set the vote tally to 1000:
