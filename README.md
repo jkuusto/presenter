@@ -41,7 +41,7 @@ Here is an example where the threat actor has tricker the victim to click a link
 </script>
 ```
 **how to fix it**<br>
-Enable 'django.middleware.csrf.CsrfViewMiddleware' middleware in settings.py and add {% csrf_token %} to all forms in the html documents. This will make sure that all forms include CSRF tokens protecting the users from unwanted actions performed without their consent.
+Enable ```'django.middleware.csrf.CsrfViewMiddleware'``` middleware in settings.py and add ```{% csrf_token %}``` to all forms in the html documents. This will make sure that all forms include CSRF tokens protecting the users from unwanted actions performed without their consent.
 
 
 ### FLAW 2: SQL Injection
