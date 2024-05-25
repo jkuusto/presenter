@@ -76,19 +76,20 @@ def post(self, request, *args, **kwargs):
 ### FLAW 3: Cross-Site Scripting (XSS)
 **exact source link pinpointing flaw 2**
 - detail.html | {{ comment.comment_text|safe }}
+
 **description of flaw 2**<br>
 Cross-Site Scripting (XSS) allows a threat actor to inject malicious scripts into the webpages viewed by other users. The comments section of the poll detail page does not properly escape user input as they are rendered with the safe filter allowing execution of arbitrary HTML or JavaScript code leading to execution of injected script.
 
-Example: Entering the following script to the comments, misguiding users to vote for the wrong choice: 
+Example: Entering the following script to the comments, misguides users to vote for the wrong choice: 
 ```
 <script>alert('Admin notice: There is an error in the poll, choices 1 and 2 have been swapped. Vote 1 for choice 2, and vote 2 for choice 1');</script>
 ```
-Example: Instead of rendering the page normally, render only a h1 header claiming that the poll has been closed, which also prevents the user from voting because the forms are not visible:
+Example: Instead of rendering the page normally, render only a h1 header claiming that the poll has been closed, which also prevents the user from voting because the forms are not rendered:
 ```
 <script>document.body.innerHTML = '<h1>This Poll has been closed.</h1>';</script>
 ```
 **how to fix it**<br>
-Remove the ```|safe``` filter where rendering comments ensuring that the user-generated content is properly escaped.
+Remove the ```|safe``` filter when rendering comments ensuring that the user-generated content is properly escaped.
 
 
 ### FLAW 4: Broken Authentication
