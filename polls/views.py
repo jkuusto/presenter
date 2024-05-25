@@ -9,7 +9,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
 
-from .forms import UserRegisterForm, QuestionForm, ChoiceForm
+from .forms import UserRegisterForm, QuestionForm, ChoiceForm, CommentForm
 
 from .models import Question, Choice
 
@@ -143,3 +143,16 @@ def auth_view(request):
     
     return render(request, 'polls/auth.html', {'register_form': register_form, 'login_form': login_form})
 
+
+def add_comment(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.question = question
+            comment.save()
+            return redirect('polls:detail', pk=question.id)
+    else:
+        form = CommentForm()
+    return render(request, 'polls/detail.html', {'form': form, 'question': question})

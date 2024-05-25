@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
-from .models import Choice, Question
+from .models import Choice, Comment, Question
 
 
 class UserRegisterForm(UserCreationForm):
@@ -23,3 +23,9 @@ class ChoiceForm(forms.ModelForm):
     class Meta:
         model = Choice
         fields = ['choice_text']
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['comment_text']

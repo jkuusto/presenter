@@ -32,4 +32,22 @@ Detail - {{ question.question_text }}
         <button type="submit">Add choice</button>
     </form>
 
+    <hr>
+
+    <h2>Comments</h2>
+    <ul>
+        {% for comment in question.comment_set.all %}
+            <li>{{ comment.comment_text|safe }}</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Add a Comment</h3>
+    <form method="post" action="{% url 'polls:add_comment' question.id %}">
+        <!--{% csrf_token %}-->
+        <p>
+            <textarea name="comment_text" id="id_comment_text" required></textarea>
+        </p>
+        <button type="submit">Submit Comment</button>
+    </form>
+
 {% endblock %}

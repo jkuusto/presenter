@@ -2,8 +2,24 @@ a {
     color: green;
 }
 
+.header-container {
+    width: 80%;
+    margin: 0 auto;
+}
+
 body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
     background: white url("images/background.webp") no-repeat;
+}
+
+nav {
+    width: 80%;
+    margin: 10px auto 10px;
+    padding: 1px 20px;
+    background-color: #fcf2f2a4;
+    border-radius: .5em
 }
 
 nav ul {
@@ -21,4 +37,12 @@ nav li a {
     display: block;
     padding: 10px;
     text-decoration: none; /* Remove underline */
+}
+
+main {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fcf2f2a4;
+    border-radius: .5em
 }

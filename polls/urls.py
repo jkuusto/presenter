@@ -19,4 +19,6 @@ urlpatterns = [
     path('auth/', views.auth_view, name='auth'), 
 
     path('logout/', auth_views.LogoutView.as_view(next_page='polls:index'), name='logout'), 
+
+    path("<int:question_id>/add_comment/", views.add_comment, name="add_comment"), 
 ]
