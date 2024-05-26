@@ -1,6 +1,6 @@
 # presenter
 
-This web app showcases a demo app, Polls, with 5 security vulnerabilities.
+This project showcases a demo app, Polls, with 5 security vulnerabilities and documentation on how to fix them: A CSRF vulnerability and four other flaws from the OSWAP Top Ten 2017 list.
 
 
 ## Table of Contents
