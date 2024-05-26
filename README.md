@@ -43,6 +43,7 @@ Here is an example where the threat actor has tricked the victim to click a link
 #### How to Fix It
 Add ```'django.middleware.csrf.CsrfViewMiddleware'``` middleware in settings.py and add ```{% csrf_token %}``` to all forms in the html documents. This will make sure that all forms include CSRF tokens protecting the users from unwanted actions performed without their consent.
 
+<br>
 
 ### FLAW 2: SQL Injection
 #### Exact Source Link Pinpointing Flaw 2
@@ -72,30 +73,32 @@ def post(self, request, *args, **kwargs):
     return render(request, self.template_name, {'form': form, 'question': self.get_object()})
 ```
 
+<br>
 
 ### FLAW 3: Cross-Site Scripting (XSS)
-#### Exact Source Link Pinpointing Flaw 2
+#### Exact Source Link Pinpointing Flaw 3
 - detail.html | {{ comment.comment_text|safe }}
 
-#### Description of Flaw 2
+#### Description of Flaw 3
 Cross-Site Scripting (XSS) allows a threat actor to inject malicious scripts into the webpages viewed by other users. The comments section of the poll detail page does not properly escape user input as they are rendered with the safe filter allowing execution of arbitrary HTML or JavaScript code leading to execution of injected script.
 
-Example: Entering the following script to the comments, misguides users to vote for the wrong choice: 
+Example 1: Entering the following script to the comments, misguides users to vote for the wrong choice: 
 ```
 <script>alert('Admin notice: There is an error in the poll, choices 1 and 2 have been swapped. Vote 1 for choice 2, and vote 2 for choice 1');</script>
 ```
-Example: Instead of rendering the page normally, render only a h1 header claiming that the poll has been closed, which also prevents the user from voting because the forms are not rendered:
+Example 2: Instead of rendering the page normally, render only a h1 header claiming that the poll has been closed, which also prevents the user from voting because the forms are not rendered:
 ```
 <script>document.body.innerHTML = '<h1>This Poll has been closed.</h1>';</script>
 ```
 #### How to Fix It
 Remove the ```|safe``` filter when rendering comments ensuring that the user-generated content is properly escaped.
 
+<br>
 
 ### FLAW 4: Broken Authentication
-#### Exact Source Link Pinpointing Flaw 2
+#### Exact Source Link Pinpointing Flaw 4
 - settings.py | AUTH_PASSWORD_VALIDATORS
-#### Description of Flaw 2
+#### Description of Flaw 4
 There are no requirements for password creation, allowing weak passwords to be set by users. For example, a user could set their password as "1".
 
 Another issue is that the app does not lock out users trying to brute force login credentials. A threat actor can try to login with a dictionary attack, for example.
@@ -158,9 +161,10 @@ AXES_COOLOFF_TIME = 1
 ```` 
 Finally, run `python manage.py migrate`.
 
+<br>
 
 ### FLAW 5: Insecure Direct Object References (IDOR)
-exact source link pinpointing flaw 2...
-description of flaw 2...
-how to fix it...
+#### Exact Source Link Pinpointing Flaw 5
+#### Description of Flaw 5
+#### How to Fix It
 
