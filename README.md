@@ -5,7 +5,7 @@ This web app showcases a demo app, Polls, with 5 security vulnerabilities.
 
 ## Table of Contents
 - [Setup](#setup)
-- [Features](#features)
+- [Flaws](#flaws)
 
 
 ## Setup
@@ -13,16 +13,16 @@ This web app showcases a demo app, Polls, with 5 security vulnerabilities.
 Coming soon.
 
 
-## Features
+## Flaws
 
 ### FLAW 1: Cross-Site Request Forgery (CSRF)
-**exact source link pinpointing flaw 1**
+#### Exact Source Link Pinpointing Flaw 1
 - index.html | <!-- {% csrf_token %} -->
 - detail.html | <!-- {% csrf_token %} -->
 - auth.html | <!-- {% csrf_token %} -->
 - settings.py | # 'django.middleware.csrf.CsrfViewMiddleware',
 
-**description of flaw 1**<br>
+#### Description of Flaw 1
 Cross-Site Request Forgery (CSRF) is an attack that forces an end user to execute unwanted actions on the application where they are logged in. This is because the app does not verify the request's origin.
 - The victim is logged into the polling application and has a valid session with the site.
 - The victim is tricked into visiting a malicious site created by the attacker.
@@ -40,23 +40,23 @@ Here is an example where the threat actor has tricked the victim to click a link
     document.getElementById('sneakyForm').submit();
 </script>
 ```
-**how to fix it**<br>
-Enable ```'django.middleware.csrf.CsrfViewMiddleware'``` middleware in settings.py and add ```{% csrf_token %}``` to all forms in the html documents. This will make sure that all forms include CSRF tokens protecting the users from unwanted actions performed without their consent.
+#### How to Fix It
+Add ```'django.middleware.csrf.CsrfViewMiddleware'``` middleware in settings.py and add ```{% csrf_token %}``` to all forms in the html documents. This will make sure that all forms include CSRF tokens protecting the users from unwanted actions performed without their consent.
 
 
 ### FLAW 2: SQL Injection
-**exact source link pinpointing flaw 2**
+#### Exact Source Link Pinpointing Flaw 2
 - views.py | class DetailView | def post
 - detail.html | second form
 
-**description of flaw 2**<br>
+#### Description of Flaw 2
 A threat actor can exploit unsanitized SQL handling to inject SQL statements via user forms. In other words, this vulnerability allows the attacker to execute arbitrary SQL commands by manipulating input data.
 
 Example: The threat actor uses the choice creator form to make a new choice while setting an arbitrary vote tally. This injection payload would create a choice "A thousand votes" and set its vote tally to 1000:
 ```
 A thousand votes', 1000); --
 ```
-**how to fix it**
+#### How to Fix It
 1. Use Django Forms for input Handling:
 - In detail.html, instead of the default html form, use ```{{ form.as_p }}``` to make use of Django's form rendering which provides built-in protection against SQL injection.
 2. Use Django's ORM for Database Operations:
@@ -74,10 +74,10 @@ def post(self, request, *args, **kwargs):
 
 
 ### FLAW 3: Cross-Site Scripting (XSS)
-**exact source link pinpointing flaw 2**
+#### Exact Source Link Pinpointing Flaw 2
 - detail.html | {{ comment.comment_text|safe }}
 
-**description of flaw 2**<br>
+#### Description of Flaw 2
 Cross-Site Scripting (XSS) allows a threat actor to inject malicious scripts into the webpages viewed by other users. The comments section of the poll detail page does not properly escape user input as they are rendered with the safe filter allowing execution of arbitrary HTML or JavaScript code leading to execution of injected script.
 
 Example: Entering the following script to the comments, misguides users to vote for the wrong choice: 
@@ -88,14 +88,75 @@ Example: Instead of rendering the page normally, render only a h1 header claimin
 ```
 <script>document.body.innerHTML = '<h1>This Poll has been closed.</h1>';</script>
 ```
-**how to fix it**<br>
+#### How to Fix It
 Remove the ```|safe``` filter when rendering comments ensuring that the user-generated content is properly escaped.
 
 
 ### FLAW 4: Broken Authentication
-exact source link pinpointing flaw 2...
-description of flaw 2...
-how to fix it...
+#### Exact Source Link Pinpointing Flaw 2
+- settings.py | AUTH_PASSWORD_VALIDATORS
+#### Description of Flaw 2
+There are no requirements for password creation, allowing weak passwords to be set by users. For example, a user could set their password as "1".
+
+Another issue is that the app does not lock out users trying to brute force login credentials. A threat actor can try to login with a dictionary attack, for example.
+#### How to Fix It
+To fix the weak password policy, create a validators.py file in the app with the following custom password validator:
+```
+import re
+from django.core.exceptions import ValidationError
+
+class CharacterPasswordValidator:
+    def validate(self, password, user=None):
+        if not re.search(r'[a-z]', password):
+            raise ValidationError("Must include lowercase letter")
+        if not re.search(r'[A-Z]', password):
+            raise ValidationError("Must include uppercase letter")
+        if not re.search(r'[0-9]', password):
+            raise ValidationError("Must include digit")
+        if not re.search(r'[^a-zA-Z0-9]', password):
+            raise ValidationError("Must include symbol")
+
+    def get_help_text(self):
+        return "Password must include lowercase letter, uppercase letter, digit, and symbol"
+```
+Then set password requirements for password creation in settings.py
+```
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 
+        'OPTIONS': {
+            'min_length': 14, 
+        }
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'polls.validators.CharacterPasswordValidator',
+    },
+]
+```
+These settings assert four requirements for passwords:
+- Prevents passwords that are similiar to the username or email address
+- Sets a minimum length for passwords (14 in this case)
+- Prevents using the most common passwords that are easy to guess
+- Requires passwords to include at least one lower case letter, one upper case letter, one digit, and one symbol
+
+To fix the brute force vulnerability, the easiest way is to use a third party solution, like `django-axes`. After installing, `django-axes` is configured in settings.py:
+```
+INSTALLED_APPS = [
+    'axes',
+]
+MIDDLEWARE = [
+    'axes.middleware.AxesMiddleware',
+]
+AXES_FAILURE_LIMIT = 3 
+AXES_COOLOFF_TIME = 1
+```` 
+Finally, run `python manage.py migrate`.
 
 
 ### FLAW 5: Insecure Direct Object References (IDOR)
