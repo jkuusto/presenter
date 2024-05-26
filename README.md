@@ -58,9 +58,7 @@ Example: The threat actor uses the choice creator form to make a new choice whil
 A thousand votes', 1000); --
 ```
 #### How to Fix It
-1. Use Django Forms for input Handling:
-- In detail.html, instead of the default html form, use ```{{ form.as_p }}``` to make use of Django's form rendering which provides built-in protection against SQL injection.
-2. Use Django's ORM for Database Operations:
+1. Use Django's ORM for Database Operations.
 - Modify the post method in views.py to use Django's ORM (Object-Relational Mapping), which automatically escapes input data to prevent SQL injection:
 ```
 def post(self, request, *args, **kwargs):
@@ -72,6 +70,8 @@ def post(self, request, *args, **kwargs):
         return redirect('polls:detail', pk=self.get_object().pk)
     return render(request, self.template_name, {'form': form, 'question': self.get_object()})
 ```
+2. Use Django Forms for input Handling.
+- In detail.html, instead of the default html form, use ```{{ form.as_p }}``` to make use of Django's form rendering which provides built-in protection against SQL injection.
 
 <br>
 
