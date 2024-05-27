@@ -61,10 +61,6 @@ class DetailView(generic.DetailView):
     def post(self, request, *args, **kwargs):
         form = ChoiceForm(request.POST)
         if form.is_valid():
-            '''choice = form.save(commit=False)
-            choice.question = self.get_object()
-            choice.save()
-            return redirect('polls:detail', pk=self.get_object().pk)'''
             choice_text = form.cleaned_data['choice_text']
             question_id = self.get_object().id
             with connection.cursor() as cursor:

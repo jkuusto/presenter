@@ -70,7 +70,7 @@ MIDDLEWARE = [
     <button type="submit">Add question</button>
 </form>
 ```
-This will make sure that all forms include CSRF tokens protecting the users from unwanted actions performed without their consent. It is also good practice to add a CSRF token to other forms that do not require authentication, such as the Add a Comment, Login, and Register forms.
+This will make sure that the forms include CSRF tokens protecting the users from unwanted actions performed without their consent. It is also good practice to add a CSRF token even to forms that do not require authentication, such as the Add a Comment, Login, and Register forms.
 
 <br>
 
@@ -82,14 +82,15 @@ This will make sure that all forms include CSRF tokens protecting the users from
 #### Description of Flaw 2
 A threat actor can exploit unsanitized SQL handling to inject SQL statements via user forms. In other words, this vulnerability allows the attacker to execute arbitrary SQL commands by manipulating input data.
 
-Example: The threat actor uses the choice creator form to make a new choice while setting an arbitrary vote tally. This injection payload would create a choice "A thousand votes" and set its vote tally to 1000:
+Example: The threat actor uses the Add New Choice form to create a choice while setting an arbitrary vote tally. This injection payload would create a choice "A thousand votes" and set its vote tally to 1000:
 ```
 A thousand votes', 1000); --
 ```
 #### How to Fix It
 1. Use Django's ORM for Database Operations.
-- Modify the post method in views.py to use Django's ORM (Object-Relational Mapping), which automatically escapes input data to prevent SQL injection:
+Modify the post method in views.py to use Django's ORM (Object-Relational Mapping), which automatically escapes input data to prevent SQL injection:
 ```
+# views.py
 def post(self, request, *args, **kwargs):
     form = ChoiceForm(request.POST)
     if form.is_valid():
@@ -100,7 +101,14 @@ def post(self, request, *args, **kwargs):
     return render(request, self.template_name, {'form': form, 'question': self.get_object()})
 ```
 2. Use Django Forms for input Handling.
-- In detail.html, instead of the default html form, use ```{{ form.as_p }}``` to make use of Django's form rendering which provides built-in protection against SQL injection.
+In detail.html, instead of the default html form, use ```{{ form.as_p }}``` to make use of Django's form rendering which provides built-in protection against SQL injection:
+```
+<!-- detail.html -->
+<form method="post">
+    {{ form.as_p }}
+    <button type="submit">Add choice</button>
+</form>
+```
 
 <br>
 
@@ -111,7 +119,7 @@ def post(self, request, *args, **kwargs):
 #### Description of Flaw 3
 Cross-Site Scripting (XSS) allows a threat actor to inject malicious scripts into the webpages viewed by other users. The comments section of the poll detail page does not properly escape user input as they are rendered with the safe filter allowing execution of arbitrary HTML or JavaScript code leading to execution of injected script.
 
-Example 1: Entering the following script to the comments, misguides users to vote for the wrong choice: 
+Example 1: Entering the following script as a comment, misguides users to vote for the wrong choice: 
 ```
 <script>alert('Admin notice: There is an error in the poll, choices 1 and 2 have been swapped. Vote 1 for choice 2, and vote 2 for choice 1');</script>
 ```
@@ -120,7 +128,15 @@ Example 2: Instead of rendering the page normally, render only a h1 header claim
 <script>document.body.innerHTML = '<h1>This Poll has been closed.</h1>';</script>
 ```
 #### How to Fix It
-Remove the ```|safe``` filter when rendering comments ensuring that the user-generated content is properly escaped.
+Remove the ```|safe``` filter when rendering comments ensuring that the user-generated content is properly escaped:
+```
+<!-- detail.html -->
+<ul>
+    {% for comment in question.comment_set.all %}
+        <li>{{ comment.comment_text }}</li>
+    {% endfor %}
+</ul>
+```
 
 <br>
 
@@ -128,12 +144,13 @@ Remove the ```|safe``` filter when rendering comments ensuring that the user-gen
 #### Exact Source Link Pinpointing Flaw 4
 - settings.py | AUTH_PASSWORD_VALIDATORS
 #### Description of Flaw 4
-There are no requirements for password creation, allowing weak passwords to be set by users. For example, a user could set their password as "1".
+There are no requirements for password creation, allowing weak passwords to be set by users. A user could set their password even as just "1" during registration.
 
-Another issue is that the app does not lock out users trying to brute force login credentials. A threat actor can try to login with a dictionary attack, for example.
+Another issue is that the app does not lock out users trying to brute force login credentials. For example, a threat actor can use a dictionary attack to try to login as another user.
 #### How to Fix It
 To fix the weak password policy, create a validators.py file in the app with the following custom password validator:
 ```
+# validators.py
 import re
 from django.core.exceptions import ValidationError
 
@@ -153,6 +170,7 @@ class CharacterPasswordValidator:
 ```
 Then set password requirements for password creation in settings.py
 ```
+# settings.py
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -177,8 +195,9 @@ These settings assert four requirements for passwords:
 - Prevents using the most common passwords that are easy to guess
 - Requires passwords to include at least one lower case letter, one upper case letter, one digit, and one symbol
 
-To fix the brute force vulnerability, the easiest way is to use a third party solution, like `django-axes`. After installing, `django-axes` is configured in settings.py:
+To fix the brute force vulnerability, the easiest way is to use a third party solution, like `django-axes`. After installation, `django-axes` is configured in settings.py:
 ```
+# settings.py
 INSTALLED_APPS = [
     'axes',
 ]
@@ -196,12 +215,13 @@ Finally, run `python manage.py migrate`.
 #### Exact Source Link Pinpointing Flaw 5
 - views.py | class ResultsView
 #### Description of Flaw 5
-It is the intent of the app that only logged-in users can vote and view the vote results. When an authenticated user votes, they are automatically redirected to the poll question's results page. There is no direct navigational link to the results.
+It is the intent of the app that only logged-in users can vote and view the vote results. Only an authenticated user can vote, after which they are automatically redirected to the poll question's results page. There is no direct navigational link to view the results without voting.
 
-However, due to a Broken Access Control vulnerability, in this case an Insecure Direct Object References (IDOR) flaw, an anonymous user can access the results page by typing the page URL directly into the browser's address bar. For example, to access the results of poll question id 1, one could go directly to ```/polls/1/results/```. Even worse, the link can be shared on a public forum exposing poll data that is meant to be seen only by authorized users.
+However, due to a Broken Access Control vulnerability, specifically an Insecure Direct Object References (IDOR) flaw, an anonymous user can access the results page by typing the page URL directly into the browser's address bar. For example, to access the results of poll question id 1, one could go directly to ```/polls/1/results/```. This way, the link can also be shared on a public forum exposing poll data that is meant to be seen only by authorized users.
 #### How to Fix It
-Add a ```@method_decorator(login_required, name='dispatch')``` decorator to the ```ResultsView``` class:
+Add a ```@method_decorator(login_required, name='dispatch')``` decorator to the ResultsView class:
 ```
+# views.py
 @method_decorator(login_required, name='dispatch')
 class ResultsView(generic.DetailView):
     model = Question
