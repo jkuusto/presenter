@@ -18,7 +18,7 @@ Coming soon.
 ### FLAW 1: Cross-Site Request Forgery (CSRF)
 #### Exact Source Link Pinpointing Flaw 1
 - https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L9
-- https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L35
+- https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L36
 - https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/index.html#L26
 - https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L50
 
@@ -77,7 +77,7 @@ This will make sure that the forms include CSRF tokens protecting the users from
 ### FLAW 2: Injection
 #### Exact Source Link Pinpointing Flaw 2
 - https://github.com/jkuusto/presenter/blob/main/polls/views.py#L67
-- https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L35
+- https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L37
 
 #### Description of Flaw 2
 A threat actor can exploit unsanitized SQL handling to inject SQL statements via user forms. In other words, this vulnerability allows the attacker to execute arbitrary SQL commands by manipulating input data.
@@ -114,7 +114,7 @@ In detail.html, instead of the default html form, use ```{{ form.as_p }}``` to m
 
 ### FLAW 3: Cross-Site Scripting (XSS)
 #### Exact Source Link Pinpointing Flaw 3
-- detail.html | {{ comment.comment_text|safe }}
+- https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L47
 
 #### Description of Flaw 3
 Cross-Site Scripting (XSS) allows a threat actor to inject malicious scripts into the webpages viewed by other users. The comments section of the poll detail page does not properly escape user input as they are rendered with the safe filter allowing execution of arbitrary HTML or JavaScript code leading to execution of injected script.
@@ -142,7 +142,7 @@ Remove the ```|safe``` filter when rendering comments ensuring that the user-gen
 
 ### FLAW 4: Broken Authentication
 #### Exact Source Link Pinpointing Flaw 4
-- settings.py | AUTH_PASSWORD_VALIDATORS
+- https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L89
 #### Description of Flaw 4
 There are no requirements for password creation, allowing weak passwords to be set by users. A user could set their password even as just "1" during registration.
 
@@ -213,7 +213,7 @@ Finally, run `python manage.py migrate`.
 
 ### FLAW 5: Broken Access Control
 #### Exact Source Link Pinpointing Flaw 5
-- views.py | class ResultsView
+- https://github.com/jkuusto/presenter/blob/main/polls/views.py#L71
 #### Description of Flaw 5
 It is the intent of the app that only logged-in users can vote and view the vote results. Only an authenticated user can vote, after which they are automatically redirected to the poll question's results page. There is no direct navigational link to view the results without voting.
 
