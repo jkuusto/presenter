@@ -31,17 +31,38 @@ The polling application processes the request as if it were initiated by the vic
 
 Here is an example where the threat actor has tricked the victim to click a link to a site where the victim's authentication is abused to vote for choice 1 automatically: 
 ```
-<form action="http://localhost:8000/polls/1/vote/" method="post" id="snkeakyForm">
+<form action="http://localhost:8000/polls/1/vote/" method="post" id="snkeakyVoteForm">
     <input type="hidden" name="choice" value="1">
     <input type="submit" value="Submit Vote">
 </form>
 
 <script>
-    document.getElementById('sneakyForm').submit();
+    document.getElementById('sneakyVoteForm').submit();
 </script>
 ```
 #### How to Fix It
-Add ```'django.middleware.csrf.CsrfViewMiddleware'``` middleware in settings.py and add ```{% csrf_token %}``` to all forms in the html documents. This will make sure that all forms include CSRF tokens protecting the users from unwanted actions performed without their consent.
+Add ```'django.middleware.csrf.CsrfViewMiddleware'``` middleware in settings.py and add ```{% csrf_token %}``` to the Vote, Add New Choice, and Add New Poll forms in the detail.html and index.html documents:
+```
+<form action="{% url 'polls:vote' question.id %}" method="post">
+    {% csrf_token %}
+    <fieldset>
+    <!-- rest of the form -->
+```
+```
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="choice_text" placeholder="Enter your choice">
+    <button type="submit">Add choice</button>
+</form>
+```
+```
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Add question</button>
+</form>
+```
+This will make sure that all forms include CSRF tokens protecting the users from unwanted actions performed without their consent. It is also good practice to add the token to other forms that do not require authentication, such as the Add a Comment, Login, and Register forms.
 
 <br>
 
@@ -171,12 +192,12 @@ It is the intent of the app that only logged-in users can vote and view the vote
 
 However, due to a Broken Access Control vulnerability, in this case an Insecure Direct Object References (IDOR) flaw, an anonymous user can access the results page by typing the page URL directly into the browser's address bar. For example, to access the results of poll question id 1, one could go directly to ```/polls/1/results/```. Even worse, the link can be shared on a public forum exposing poll data that is meant to be seen only by authorized users.
 #### How to Fix It
-Add a ```@method_decorator(login_required, name='dispatch')``` decorator to the ```ResultsView```` class to make sure that only authenticated users can access the results page:
+Add a ```@method_decorator(login_required, name='dispatch')``` decorator to the ```ResultsView``` class:
 ```
 @method_decorator(login_required, name='dispatch')
 class ResultsView(generic.DetailView):
     model = Question
     template_name = "polls/results.html"
 ```
-This decorator enforces that access to each results view is granted only when a user is logged in, fixing the broken access control flaw.
+This enforces that access to each results view is granted only when a user is logged in, fixing the broken access control flaw.
 

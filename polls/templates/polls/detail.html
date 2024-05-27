@@ -6,7 +6,6 @@ Detail - {{ question.question_text }}
 
 {% block content %}
     <form action="{% url 'polls:vote' question.id %}" method="post">
-        <!-- {% csrf_token %} -->
         <fieldset>
             <legend><h2>{{ question.question_text }}</h2></legend>
             {% if error_message %}
@@ -33,7 +32,6 @@ Detail - {{ question.question_text }}
     <h2>Add New Choice</h2>
 
     <form method="post">
-        <!-- {% csrf_token %} -->
         <input type="text" name="choice_text" placeholder="Enter your choice">
         <!-- {{ form.as_p }} -->
         <button type="submit">Add choice</button>
@@ -50,7 +48,6 @@ Detail - {{ question.question_text }}
 
     <h3>Add a Comment</h3>
     <form method="post" action="{% url 'polls:add_comment' question.id %}">
-        <!--{% csrf_token %}-->
         <p>
             <textarea name="comment_text" id="id_comment_text" required></textarea>
         </p>
