@@ -43,12 +43,19 @@ Here is an example where the threat actor has tricked the victim to click a link
 #### How to Fix It
 Add ```'django.middleware.csrf.CsrfViewMiddleware'``` middleware in settings.py and add ```{% csrf_token %}``` to the Vote, Add New Choice, and Add New Poll forms in the detail.html and index.html documents:
 ```
+# settings.py
+MIDDLEWARE = [
+    'django.middleware.csrf.CsrfViewMiddleware', 
+    # rest of the middleware
+]
+```
+```
+<!-- detail.html -->
 <form action="{% url 'polls:vote' question.id %}" method="post">
     {% csrf_token %}
     <fieldset>
     <!-- rest of the form -->
-```
-```
+
 <form method="post">
     {% csrf_token %}
     <input type="text" name="choice_text" placeholder="Enter your choice">
@@ -56,13 +63,14 @@ Add ```'django.middleware.csrf.CsrfViewMiddleware'``` middleware in settings.py 
 </form>
 ```
 ```
+<!-- index.html -->
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Add question</button>
 </form>
 ```
-This will make sure that all forms include CSRF tokens protecting the users from unwanted actions performed without their consent. It is also good practice to add the token to other forms that do not require authentication, such as the Add a Comment, Login, and Register forms.
+This will make sure that all forms include CSRF tokens protecting the users from unwanted actions performed without their consent. It is also good practice to add a CSRF token to other forms that do not require authentication, such as the Add a Comment, Login, and Register forms.
 
 <br>
 
