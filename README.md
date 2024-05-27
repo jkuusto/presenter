@@ -17,10 +17,10 @@ Coming soon.
 
 ### FLAW 1: Cross-Site Request Forgery (CSRF)
 #### Exact Source Link Pinpointing Flaw 1
-- https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L8
-- https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L34
-- index.html | <!-- {% csrf_token %} -->
-- settings.py | # 'django.middleware.csrf.CsrfViewMiddleware',
+- https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L9
+- https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L35
+- https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/index.html#L26
+- https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L50
 
 #### Description of Flaw 1
 Cross-Site Request Forgery (CSRF) is an attack that forces an end user to execute unwanted actions on the application where they are logged in. This is because the app does not verify the request's origin.
@@ -45,8 +45,8 @@ Add ```'django.middleware.csrf.CsrfViewMiddleware'``` middleware in settings.py 
 ```
 # settings.py
 MIDDLEWARE = [
-    'django.middleware.csrf.CsrfViewMiddleware', 
     # rest of the middleware
+    'django.middleware.csrf.CsrfViewMiddleware', 
 ]
 ```
 ```
@@ -76,8 +76,8 @@ This will make sure that the forms include CSRF tokens protecting the users from
 
 ### FLAW 2: Injection
 #### Exact Source Link Pinpointing Flaw 2
-- views.py | class DetailView | def post
-- detail.html | second form
+- https://github.com/jkuusto/presenter/blob/main/polls/views.py#L67
+- https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L35
 
 #### Description of Flaw 2
 A threat actor can exploit unsanitized SQL handling to inject SQL statements via user forms. In other words, this vulnerability allows the attacker to execute arbitrary SQL commands by manipulating input data.

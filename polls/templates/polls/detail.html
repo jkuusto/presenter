@@ -6,6 +6,7 @@ Detail - {{ question.question_text }}
 
 {% block content %}
     <form action="{% url 'polls:vote' question.id %}" method="post">
+
         <fieldset>
             <legend><h2>{{ question.question_text }}</h2></legend>
             {% if error_message %}
@@ -32,6 +33,7 @@ Detail - {{ question.question_text }}
     <h2>Add New Choice</h2>
 
     <form method="post">
+        
         <input type="text" name="choice_text" placeholder="Enter your choice">
         <button type="submit">Add choice</button>
     </form>
@@ -39,7 +41,7 @@ Detail - {{ question.question_text }}
     <hr>
 
     <h2>Comments</h2>
-    
+
     <ul>
         {% for comment in question.comment_set.all %}
             <li>{{ comment.comment_text|safe }}</li>
