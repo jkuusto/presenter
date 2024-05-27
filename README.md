@@ -11,7 +11,30 @@ LINK: https://github.com/jkuusto/presenter
 
 ## Setup
 
-Coming soon.
+The project was made using Python version 3.12.0 and Django 4.2.8. It makes use of SQLite.
+
+To run the project locally, clone the repository to your local directory:
+```
+git clone https://github.com/jkuusto/presenter.git
+```
+Apply database migrations:
+```
+python manage.py migrate
+```
+You might need to also collect static files:
+```
+python manage.py collectstatic
+```
+OPTIONAL: If you don't have a superuser yet, you can created it with:
+```
+python manage.py createsuperuser
+```
+Then you can start the server:
+```
+python manage.py runserver
+```
+Finally, on your web browser, navigate to `http://127.0.0.1:8000/polls/` or `http://localhost:8000/polls/`
+
 
 ## Flaws
 
@@ -213,7 +236,7 @@ Finally, run `python manage.py migrate`.
 
 ### FLAW 5: Broken Access Control
 #### Exact Source Link Pinpointing Flaw 5
-- https://github.com/jkuusto/presenter/blob/main/polls/views.py#L71
+- https://github.com/jkuusto/presenter/blob/main/polls/views.py#L72
 #### Description of Flaw 5
 It is the intent of the app that only logged-in users can vote and view the vote results. Only an authenticated user can vote, after which they are automatically redirected to the poll question's results page. There is no direct navigational link to view the results without voting.
 
