@@ -45,7 +45,7 @@ Add ```'django.middleware.csrf.CsrfViewMiddleware'``` middleware in settings.py 
 
 <br>
 
-### FLAW 2: SQL Injection
+### FLAW 2: Injection
 #### Exact Source Link Pinpointing Flaw 2
 - views.py | class DetailView | def post
 - detail.html | second form
@@ -163,8 +163,20 @@ Finally, run `python manage.py migrate`.
 
 <br>
 
-### FLAW 5: Insecure Direct Object References (IDOR)
+### FLAW 5: Broken Access Control
 #### Exact Source Link Pinpointing Flaw 5
+- views.py | class ResultsView
 #### Description of Flaw 5
+It is the intent of the app that only logged-in users can vote and view the vote results. When an authenticated user votes, they are automatically redirected to the poll question's results page. There is no direct navigational link to the results.
+
+However, due to a Broken Access Control vulnerability, in this case an Insecure Direct Object References (IDOR) flaw, an anonymous user can access the results page by typing the page URL directly into the browser's address bar. For example, to access the results of poll question id 1, one could go directly to ```/polls/1/results/```. Even worse, the link can be shared on a public forum exposing poll data that is meant to be seen only by authorized users.
 #### How to Fix It
+Add a ```@method_decorator(login_required, name='dispatch')``` decorator to the ```ResultsView```` class to make sure that only authenticated users can access the results page:
+```
+@method_decorator(login_required, name='dispatch')
+class ResultsView(generic.DetailView):
+    model = Question
+    template_name = "polls/results.html"
+```
+This decorator enforces that access to each results view is granted only when a user is logged in, fixing the broken access control flaw.
 

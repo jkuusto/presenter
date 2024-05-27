@@ -13,5 +13,5 @@ Result - {{ question.question_text }}
     {% endfor %}
     </ul>
 
-    <a href="{% url 'polls:detail' question.id %}">Vote again?</a>
+    <a href="{% url 'polls:index' %}">Back to Polls</a>
 {% endblock %}

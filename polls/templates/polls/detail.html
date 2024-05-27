@@ -21,6 +21,13 @@ Detail - {{ question.question_text }}
         <input type="submit" value="vote">
     </form>
 
+    <p>
+        Results are shown after voting 
+        {% if not user.is_authenticated %}
+            (requires login)
+        {% endif %}
+    </p>
+
     <hr>
 
     <h2>Add New Choice</h2>
