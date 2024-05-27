@@ -2,6 +2,7 @@
 
 This project showcases a demo app, Polls, with 5 security vulnerabilities and documentation on how to fix them: A CSRF vulnerability and four other flaws from the OSWAP Top Ten 2017 list.
 
+LINK: https://github.com/jkuusto/presenter
 
 ## Table of Contents
 - [Setup](#setup)
@@ -12,14 +13,13 @@ This project showcases a demo app, Polls, with 5 security vulnerabilities and do
 
 Coming soon.
 
-
 ## Flaws
 
 ### FLAW 1: Cross-Site Request Forgery (CSRF)
 #### Exact Source Link Pinpointing Flaw 1
+- https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L8
+- https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L34
 - index.html | <!-- {% csrf_token %} -->
-- detail.html | <!-- {% csrf_token %} -->
-- auth.html | <!-- {% csrf_token %} -->
 - settings.py | # 'django.middleware.csrf.CsrfViewMiddleware',
 
 #### Description of Flaw 1

@@ -39,6 +39,7 @@ Detail - {{ question.question_text }}
     <hr>
 
     <h2>Comments</h2>
+    
     <ul>
         {% for comment in question.comment_set.all %}
             <li>{{ comment.comment_text|safe }}</li>
