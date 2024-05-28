@@ -74,7 +74,7 @@ class DetailView(generic.DetailView):
         return render(request, self.template_name, {'form': form, 'question': self.get_object()})
 
 
-
+# @method_decorator(login_required, name='dispatch')
 class ResultsView(generic.DetailView):
     model = Question
     template_name = "polls/results.html"
