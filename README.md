@@ -163,7 +163,7 @@ The three other settings assert these additional requirements for passwords:
 - Set a minimum length for passwords (14 in this case)
 - Prevent using the most common passwords that are easy to guess
 
-To fix the brute force vulnerability, the easiest way is to use a third party solution, like `django-axes`.
+As an additional measure, the easiest way to fix the brute force vulnerability is to use a third party solution, like `django-axes`.
 ```
 pip install django-axes
 ```
