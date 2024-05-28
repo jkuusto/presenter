@@ -132,7 +132,7 @@ Example 2: Instead of rendering the page normally, render only a h1 header claim
 <script>document.body.innerHTML = '<h1>This Poll has been closed.</h1>';</script>
 ```
 #### How to Fix It
-Remove the ```|safe``` filter when rendering comments ensuring that the user-generated content is properly escaped:
+Remove the `|safe` filter when rendering comments ensuring that the user-generated content is properly escaped:
 ```
 <!-- detail.html -->
 <ul>
@@ -141,6 +141,7 @@ Remove the ```|safe``` filter when rendering comments ensuring that the user-gen
     {% endfor %}
 </ul>
 ```
+- https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L51
 
 <br>
 
