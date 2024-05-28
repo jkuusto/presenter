@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from django.utils.html import escape
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
@@ -153,6 +154,7 @@ def add_comment(request, question_id):
         if form.is_valid():
             comment = form.save(commit=False)
             comment.question = question
+            # comment.comment_text = escape(comment.comment_text)
             comment.save()
             return redirect('polls:detail', pk=question.id)
     else:
