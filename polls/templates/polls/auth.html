@@ -10,6 +10,7 @@ Login / Register
     <p>You must be logged in to add polls and choices, vote and view results.</p>
 
     <form method="POST">
+        <!-- {% csrf_token %} -->
         {{ login_form.as_p }}
         <button type="submit" name="login">Login</button>
     </form>
@@ -18,6 +19,7 @@ Login / Register
 
     <h2>Register</h2>
     <form method="POST">
+        <!-- {% csrf_token %} -->
         {{ register_form.as_p }}
         <button type="submit" name="register">Register</button>
     </form>
