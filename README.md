@@ -1,4 +1,4 @@
-# presenter
+# Presenter: Polls
 
 The project showcases a demo app, Polls, with 5 security vulnerabilities and documentation on how to fix them: A CSRF vulnerability and four other flaws from the OSWAP Top Ten 2017 list.
 
@@ -168,8 +168,6 @@ To fix the brute force vulnerability, the easiest way is to use a third party so
 pip install django-axes
 ```
 After installation, `django-axes` is configured in settings.py:
-```
-# settings.py
 - https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L41
 - https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L52
 - https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L108
