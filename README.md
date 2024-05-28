@@ -70,7 +70,7 @@ Example: The threat actor has tricked the victim to click a link to a site and t
 Add `'django.middleware.csrf.CsrfViewMiddleware'` middleware in settings.py and add `{% csrf_token %}` to the Vote, Add New Choice, and Add New Poll forms in the detail.html and index.html documents (see the source links above). This will make sure that the forms include CSRF tokens protecting the users from unwanted actions performed without their consent.
 
 It is also good practice to add a CSRF token even to forms that do not require authentication, such as the Add a Comment, Login, and Register forms: 
-- https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L55
+- https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L57
 - https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/auth.html#L13
 - https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/auth.html#L22
 
@@ -118,7 +118,7 @@ In detail.html, instead of the default html form, use `{{ form.as_p }}` to make 
 
 ### FLAW 3: Cross-Site Scripting (XSS)
 #### Exact Source Link Pinpointing Flaw 3
-- https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L47
+- https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L49
 
 #### Description of Flaw 3
 Cross-Site Scripting (XSS) allows a threat actor to inject malicious scripts into the webpages viewed by other users. The comments section of the poll detail page does not properly escape user input as they are rendered with the safe filter allowing execution of arbitrary HTML or JavaScript code leading to execution of injected script.
@@ -127,7 +127,7 @@ Example 1: Entering the following script as a comment, misguides users to vote f
 ```
 <script>alert('Admin notice: There is an error in the poll, choices 1 and 2 have been swapped. Vote 1 for choice 2, and vote 2 for choice 1');</script>
 ```
-Example 2: Instead of rendering the page normally, render only a h1 header claiming that the poll has been closed, which also prevents the user from voting because the forms are not rendered:
+Example 2: Instead of rendering the page normally, render only a h1 header claiming that the poll has been closed, which also prevents the user from voting as the forms are not rendered:
 ```
 <script>document.body.innerHTML = '<h1>This Poll has been closed.</h1>';</script>
 ```
