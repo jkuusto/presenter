@@ -118,7 +118,7 @@ In detail.html, instead of the default html form, use `{{ form.as_p }}` to enabl
 
 ### FLAW 3: Cross-Site Scripting (XSS)
 #### Exact Source Link Pinpointing Flaw 3
-- https://github.com/jkuusto/presenter/blob/main/polls/views.py#L150
+- https://github.com/jkuusto/presenter/blob/main/polls/views.py#L158
 - https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L49
 
 #### Description of Flaw 3
@@ -134,10 +134,10 @@ Example 2: Instead of rendering the page normally, render only a h1 header claim
 ```
 #### How to Fix It
 1. Escape characters when adding comments. <br>
-Add `comment.comment_text = escape(comment.comment_text)`to the add_comment function. This ensures that the user content is escaped properly when stored in the database.
+Add `comment.comment_text = escape(comment.comment_text)` to the add_comment function. This ensures that the user content is escaped properly when stored in the database.
 
 - https://github.com/jkuusto/presenter/blob/main/polls/views.py#L157
-2. Escape characters when renderingt them. <br>
+2. Escape characters when rendering them. <br>
 Remove the `|safe` filter when rendering comments. This enables Django's built-in backend mechanisms to ensure that user-generated content is properly escaped when rendered:
 ```
 <!-- detail.html -->
