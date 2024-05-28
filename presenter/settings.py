@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 'axes',
 ]
 
 MIDDLEWARE = [
@@ -48,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # 'django.middleware.csrf.CsrfViewMiddleware',
+    # 'axes.middleware.AxesMiddleware',
 ]
 
 ROOT_URLCONF = 'presenter.urls'
@@ -102,6 +104,13 @@ AUTH_PASSWORD_VALIDATORS = [
     #     'NAME': 'polls.validators.CharacterPasswordValidator',
     # },
 ]
+
+# AUTHENTICATION_BACKENDS = [
+#     'axes.backends.AxesBackend',
+#     'django.contrib.auth.backends.ModelBackend',
+# ]
+# AXES_FAILURE_LIMIT = 3
+# AXES_COOLOFF_TIME = 1
 
 
 # Internationalization
