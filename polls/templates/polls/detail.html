@@ -35,7 +35,7 @@ Detail - {{ question.question_text }}
     <form method="post">
         <!-- {% csrf_token %} -->
         <input type="text" name="choice_text" placeholder="Enter your choice">
-        <!-- Instead of the line above, replace with the following code to use Django Forms-->
+        <!-- Instead of the line above, replace with the following code to use Django Forms -->
         <!-- {{ form.as_p }} -->
         <button type="submit">Add choice</button>
     </form>
@@ -47,6 +47,8 @@ Detail - {{ question.question_text }}
     <ul>
         {% for comment in question.comment_set.all %}
             <li>{{ comment.comment_text|safe }}</li>
+            <!-- Instead of the line above, replace with the following code to remove the safe filter -->
+            <!-- <li>{{ comment.comment_text }}</li> -->
         {% endfor %}
     </ul>
 
