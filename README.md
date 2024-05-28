@@ -15,7 +15,7 @@ The project was made using Python version 3.12.0 and is likely compatible with o
 ```
 pip install Django==4.2.8
 ```
-Newer versions of Django should work as well. There are no further dependencies, so a `requirements.txt` file is not included.
+Newer versions of Django should work as well. There are no further dependencies, so a `requirements.txt` file is not included. However, you might want to install `django-axes` to fix the brute force vulnerability in flaw 4.
 
 To run the project locally, clone the repository:
 ```
@@ -149,56 +149,18 @@ Remove the `|safe` filter when rendering comments ensuring that the user-generat
 #### Exact Source Link Pinpointing Flaw 4
 - https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L89
 #### Description of Flaw 4
-There are no requirements for password creation, allowing weak passwords to be set by users. A user could set their password even as just "1" during registration.
+There are no requirements for password creation, allowing weak passwords to be set by users. A user could set their password even as just "1" during registration on the auth page.
 
-Another issue is that the app does not lock out users trying to brute force login credentials. For example, a threat actor can use a dictionary attack to try to login as another user.
+Another issue is that the app does not lock out users trying to brute force login credentials on the auth page. 
 #### How to Fix It
-To fix the weak password policy, create a validators.py file in the app with the following custom password validator:
-```
-# validators.py
-import re
-from django.core.exceptions import ValidationError
-
-class CharacterPasswordValidator:
-    def validate(self, password, user=None):
-        if not re.search(r'[a-z]', password):
-            raise ValidationError("Must include lowercase letter")
-        if not re.search(r'[A-Z]', password):
-            raise ValidationError("Must include uppercase letter")
-        if not re.search(r'[0-9]', password):
-            raise ValidationError("Must include digit")
-        if not re.search(r'[^a-zA-Z0-9]', password):
-            raise ValidationError("Must include symbol")
-
-    def get_help_text(self):
-        return "Password must include lowercase letter, uppercase letter, digit, and symbol"
-```
+To fix the weak password policy, use the validators.py file in the app with a custom password validator that requires passwords to include at least one lower case letter, one upper case letter, one digit, and one symbol.
+- https://github.com/jkuusto/presenter/blob/main/polls/validators.py#L1
 Then set password requirements for password creation in settings.py
-```
-# settings.py
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 
-        'OPTIONS': {
-            'min_length': 14, 
-        }
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'polls.validators.CharacterPasswordValidator',
-    },
-]
-```
-These settings assert four requirements for passwords:
-- Prevents passwords that are similiar to the username or email address
-- Sets a minimum length for passwords (14 in this case)
-- Prevents using the most common passwords that are easy to guess
-- Requires passwords to include at least one lower case letter, one upper case letter, one digit, and one symbol
+- https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L89
+The three other settings assert these additional requirements for passwords:
+- Prevent passwords that are similiar to the username or email address
+- Set a minimum length for passwords (14 in this case)
+- Prevent using the most common passwords that are easy to guess
 
 To fix the brute force vulnerability, the easiest way is to use a third party solution, like `django-axes`. After installation, `django-axes` is configured in settings.py:
 ```
@@ -208,6 +170,10 @@ INSTALLED_APPS = [
 ]
 MIDDLEWARE = [
     'axes.middleware.AxesMiddleware',
+]
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 AXES_FAILURE_LIMIT = 3 
 AXES_COOLOFF_TIME = 1
@@ -222,9 +188,9 @@ Finally, run `python manage.py migrate`.
 #### Description of Flaw 5
 It is the intent of the app that only logged-in users can vote and view the vote results. Only an authenticated user can vote, after which they are automatically redirected to the poll question's results page. There is no direct navigational link to view the results without voting.
 
-However, due to a Broken Access Control vulnerability, specifically an Insecure Direct Object References (IDOR) flaw, an anonymous user can access the results page by typing the page URL directly into the browser's address bar. For example, to access the results of poll question id 1, one could go directly to ```/polls/1/results/```. This way, the link can also be shared on a public forum exposing poll data that is meant to be seen only by authorized users.
+However, due to a Broken Access Control vulnerability, specifically an Insecure Direct Object References (IDOR) flaw, an anonymous user can access the results page by typing the page URL directly into the browser's address bar. For example, to access the results of poll question id 1, one could go directly to `/polls/1/results/`. This way, the link can also be shared on a public forum exposing poll data that is meant to be seen only by authorized users.
 #### How to Fix It
-Add a ```@method_decorator(login_required, name='dispatch')``` decorator to the ResultsView class:
+Add a `@method_decorator(login_required, name='dispatch')` decorator to the ResultsView class:
 ```
 # views.py
 @method_decorator(login_required, name='dispatch')
