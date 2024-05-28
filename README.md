@@ -15,7 +15,7 @@ The project was made using Python version 3.12.0 and is likely compatible with o
 ```
 pip install Django==4.2.8
 ```
-Newer versions of Django should work as well. There are no further dependencies, so a `requirements.txt` file is not included. However, you might want to install `django-axes` to fix the brute force vulnerability in flaw 4.
+Newer versions of Django should work as well. There are no further dependencies, so a `requirements.txt` file is not included. However, you might consider installing `django-axes` to fix the brute force vulnerability in Flaw 4.
 
 To run the project locally, clone the repository:
 ```
@@ -67,7 +67,7 @@ Example: The threat actor has tricked the victim to click a link to a site and t
 </script>
 ```
 #### How to Fix It
-Add `'django.middleware.csrf.CsrfViewMiddleware'` in settings.py and add `{% csrf_token %}` to the Vote, Add New Choice, and Add New Poll forms in the detail.html and index.html documents (see the source links above). This will make sure that the forms include CSRF tokens protecting the users from unwanted actions performed without their consent.
+Add `'django.middleware.csrf.CsrfViewMiddleware'` in settings.py and add `{% csrf_token %}` to the Vote, Add New Choice, and Add New Poll forms in the detail.html and index.html documents (see the source links above). This will make sure that the forms send a CSRF token to the server protecting users from actions performed without their consent.
 
 It is also good practice to add a CSRF token even to forms that do not require authentication, such as the Add a Comment, Login, and Register forms: 
 - https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L57
@@ -137,7 +137,7 @@ Example 2: Instead of rendering the page normally, render only a h1 header claim
 Add `comment.comment_text = escape(comment.comment_text)` to the add_comment function. This ensures that the user content is escaped properly when stored in the database.
 
 - https://github.com/jkuusto/presenter/blob/main/polls/views.py#L157
-2. Escape characters when rendering them. <br>
+2. Escape characters when rendering comments. <br>
 Remove the `|safe` filter when rendering comments. This enables Django's built-in backend mechanisms to ensure that user-generated content is properly escaped when rendered:
 ```
 <!-- detail.html -->
