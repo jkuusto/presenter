@@ -11,29 +11,32 @@ LINK: https://github.com/jkuusto/presenter
 
 ## Setup
 
-The project was made using Python version 3.12.0 and Django 4.2.8. It makes use of SQLite.
+The project was made using Python version 3.12.0 and is likely compatible with older versions. It makes use of SQLite that is shipped with Python. The project requires Django 4.2.8, which can be installed globally or within a virtual environment using pip:
+```
+pip install Django==4.2.8
+```
+Newer versions of Django should work as well. There are no further dependencies, so a `requirements.txt` file is not included.
 
-To run the project locally, clone the repository to your local directory:
+To run the project locally, clone the repository:
 ```
 git clone https://github.com/jkuusto/presenter.git
+cd presenter
 ```
-Apply database migrations:
+The included db.sqlite3 has some preset data. You can use it as is. Alternatively, to start fresh, delete the database file and apply migrations:
 ```
 python manage.py migrate
 ```
-You might need to also collect static files:
-```
-python manage.py collectstatic
-```
-OPTIONAL: If you don't have a superuser yet, you can created it with:
+(Optional) If you migrated the database and need admin access, create a superuser:
 ```
 python manage.py createsuperuser
 ```
-Then you can start the server:
+Start the server:
 ```
 python manage.py runserver
 ```
-Finally, on your web browser, navigate to `http://127.0.0.1:8000/polls/` or `http://localhost:8000/polls/`
+Finally, open your web browser and navigate to:
+- `http://127.0.0.1:8000/polls/` or 
+- `http://localhost:8000/polls/`
 
 
 ## Flaws
