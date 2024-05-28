@@ -134,7 +134,7 @@ Example 2: Instead of rendering the page normally, render only a h1 header claim
 ```
 #### How to Fix It
 1. Escape characters when adding comments. <br>
-Add `comment.comment_text = escape(comment.comment_text)` to the add_comment function. This ensures that the user content is escaped properly when stored in the database.
+Add `comment.comment_text = escape(comment.comment_text)` to the add_comment function. This ensures that the user content is escaped properly when stored in the database however it may be rendered later.
 
 - https://github.com/jkuusto/presenter/blob/main/polls/views.py#L157
 2. Escape characters when rendering comments. <br>
@@ -188,7 +188,7 @@ Finally, run `python manage.py migrate`.
 #### Description of Flaw 5
 The design of the app dictates that only logged-in users can vote and view the vote results. After an authenticated user has voted, they are automatically redirected to the poll question's results page. There is no direct navigational link to view the results without voting.
 
-However, due to a Broken Access Control vulnerability, specifically an Insecure Direct Object References (IDOR) flaw, an anonymous user can access the results page by typing the page URL directly into the browser's address bar. For example, to access the results of poll question id 1, one could go directly to `/polls/1/results/`. This way, the link can also be shared on a public forum exposing poll data that is meant to be seen only by authorized users.
+However, due to a Broken Access Control vulnerability, specifically an Insecure Direct Object References (IDOR) flaw, an anonymous user can access the results page by manipulating the URL directly in the browser's address bar. For example, to access the results of poll question id 1, one could go directly to `/polls/1/results/`. This way, the link can also be shared on a public forum exposing poll data that is meant to be seen only by authorized users.
 #### How to Fix It
-Add a `@method_decorator(login_required, name='dispatch')` decorator to the ResultsView class in the views backend (see source code link above). This ensures that access to each results view is granted only when a user is logged in, fixing the broken access control flaw.
+Add a `@method_decorator(login_required, name='dispatch')` decorator to the ResultsView class in views.py (see source code link above). This ensures that access to each results view is granted only when a user is logged in, fixing the broken access control flaw.
 
