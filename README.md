@@ -147,7 +147,7 @@ Remove the `|safe` filter when rendering comments ensuring that the user-generat
 
 ### FLAW 4: Broken Authentication
 #### Exact Source Link Pinpointing Flaw 4
-- https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L89
+- https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L91
 #### Description of Flaw 4
 There are no requirements for password creation, allowing weak passwords to be set by users. A user could set their password even as just "1" during registration on the auth page.
 
@@ -155,8 +155,9 @@ Another issue is that the app does not lock out users trying to brute force logi
 #### How to Fix It
 To fix the weak password policy, use the validators.py file in the app with a custom password validator that requires passwords to include at least one lower case letter, one upper case letter, one digit, and one symbol.
 - https://github.com/jkuusto/presenter/blob/main/polls/validators.py#L1
-Then set password requirements for password creation in settings.py
-- https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L89 <br>
+
+Then set password requirements for password creation in settings.py (see source link above).
+
 The three other settings assert these additional requirements for passwords:
 - Prevent passwords that are similiar to the username or email address
 - Set a minimum length for passwords (14 in this case)
@@ -169,26 +170,10 @@ pip install django-axes
 After installation, `django-axes` is configured in settings.py:
 ```
 # settings.py
-INSTALLED_APPS = [
-    'axes',
-]
-```
 - https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L41
-```
-MIDDLEWARE = [
-    'axes.middleware.AxesMiddleware',
-]
-```
 - https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L52
-```
-AUTHENTICATION_BACKENDS = [
-    'axes.backends.AxesBackend',
-    'django.contrib.auth.backends.ModelBackend',
-]
-AXES_FAILURE_LIMIT = 3 
-AXES_COOLOFF_TIME = 1
-````
-- https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L108 <br>
+- https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L108
+
 Finally, run `python manage.py migrate`.
 
 <br>
