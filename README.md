@@ -1,6 +1,6 @@
 # presenter
 
-This project showcases a demo app, Polls, with 5 security vulnerabilities and documentation on how to fix them: A CSRF vulnerability and four other flaws from the OSWAP Top Ten 2017 list.
+The project showcases a demo app, Polls, with 5 security vulnerabilities and documentation on how to fix them: A CSRF vulnerability and four other flaws from the OSWAP Top Ten 2017 list.
 
 LINK: https://github.com/jkuusto/presenter
 
@@ -43,19 +43,19 @@ Finally, open your web browser and navigate to:
 
 ### FLAW 1: Cross-Site Request Forgery (CSRF)
 #### Exact Source Link Pinpointing Flaw 1
+- https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L50
 - https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L9
 - https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L36
 - https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/index.html#L26
-- https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L50
 
 #### Description of Flaw 1
-Cross-Site Request Forgery (CSRF) is an attack that forces an end user to execute unwanted actions on the application where they are logged in. This is because the app does not verify the request's origin.
+Cross-Site Request Forgery (CSRF) is an attack that forces an end user to execute unwanted actions on the application where they are logged in. This is possible because the app does not verify the request's origin.
 - The victim is logged into the polling application and has a valid session with the site.
 - The victim is tricked into visiting a malicious site created by the attacker.
 - The malicious site contains a form that auto-submits a request to the polling application, using the victim's authenticated session.
 The polling application processes the request as if it were initiated by the victim. The threat actor may want to manipulate the results of a poll by casting votes without the users' knowledge or they may want to introduce inappropriate or misleading choices to an existing poll question.
 
-Here is an example where the threat actor has tricked the victim to click a link to a site where the victim's authentication is abused to vote for choice 1 automatically: 
+Example: The threat actor has tricked the victim to click a link to a site and the victim's authentication is abused to vote for choice 1 automatically: 
 ```
 <form action="http://localhost:8000/polls/1/vote/" method="post" id="snkeakyVoteForm">
     <input type="hidden" name="choice" value="1">
@@ -67,36 +67,12 @@ Here is an example where the threat actor has tricked the victim to click a link
 </script>
 ```
 #### How to Fix It
-Add ```'django.middleware.csrf.CsrfViewMiddleware'``` middleware in settings.py and add ```{% csrf_token %}``` to the Vote, Add New Choice, and Add New Poll forms in the detail.html and index.html documents:
-```
-# settings.py
-MIDDLEWARE = [
-    # rest of the middleware
-    'django.middleware.csrf.CsrfViewMiddleware', 
-]
-```
-```
-<!-- detail.html -->
-<form action="{% url 'polls:vote' question.id %}" method="post">
-    {% csrf_token %}
-    <fieldset>
-    <!-- rest of the form -->
+Add `'django.middleware.csrf.CsrfViewMiddleware'` middleware in settings.py and add `{% csrf_token %}` to the Vote, Add New Choice, and Add New Poll forms in the detail.html and index.html documents (see the source links above). This will make sure that the forms include CSRF tokens protecting the users from unwanted actions performed without their consent.
 
-<form method="post">
-    {% csrf_token %}
-    <input type="text" name="choice_text" placeholder="Enter your choice">
-    <button type="submit">Add choice</button>
-</form>
-```
-```
-<!-- index.html -->
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Add question</button>
-</form>
-```
-This will make sure that the forms include CSRF tokens protecting the users from unwanted actions performed without their consent. It is also good practice to add a CSRF token even to forms that do not require authentication, such as the Add a Comment, Login, and Register forms.
+It is also good practice to add a CSRF token even to forms that do not require authentication, such as the Add a Comment, Login, and Register forms: 
+- https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L53
+- https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/auth.html#L13
+- https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/auth.html#L22
 
 <br>
 

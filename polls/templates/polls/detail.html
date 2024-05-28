@@ -35,6 +35,8 @@ Detail - {{ question.question_text }}
     <form method="post">
         <!-- {% csrf_token %} -->
         <input type="text" name="choice_text" placeholder="Enter your choice">
+        <!-- Instead of the line above, replace with the following code to use Django Forms-->
+        <!-- {{ form.as_p }} -->
         <button type="submit">Add choice</button>
     </form>
 

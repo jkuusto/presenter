@@ -66,6 +66,11 @@ class DetailView(generic.DetailView):
             with connection.cursor() as cursor:
                 cursor.execute(f"INSERT INTO polls_choice (question_id, choice_text, votes) VALUES ({question_id}, '{choice_text}', 0)")
             return redirect('polls:detail', pk=question_id)
+            # Instead of the above, replace with the following code to use ORM
+            # choice = form.save(commit=False)
+            # choice.question = self.get_object()
+            # choice.save()
+            # return redirect('polls:detail', pk=self.get_object().pk)
         return render(request, self.template_name, {'form': form, 'question': self.get_object()})
 
 
