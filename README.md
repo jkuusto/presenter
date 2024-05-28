@@ -43,7 +43,7 @@ Finally, open your web browser and navigate to:
 
 ### FLAW 1: Cross-Site Request Forgery (CSRF)
 #### Exact Source Link Pinpointing Flaw 1
-- https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L50
+- https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L51
 - https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L9
 - https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L36
 - https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/index.html#L26
@@ -156,28 +156,39 @@ Another issue is that the app does not lock out users trying to brute force logi
 To fix the weak password policy, use the validators.py file in the app with a custom password validator that requires passwords to include at least one lower case letter, one upper case letter, one digit, and one symbol.
 - https://github.com/jkuusto/presenter/blob/main/polls/validators.py#L1
 Then set password requirements for password creation in settings.py
-- https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L89
+- https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L89 <br>
 The three other settings assert these additional requirements for passwords:
 - Prevent passwords that are similiar to the username or email address
 - Set a minimum length for passwords (14 in this case)
 - Prevent using the most common passwords that are easy to guess
 
-To fix the brute force vulnerability, the easiest way is to use a third party solution, like `django-axes`. After installation, `django-axes` is configured in settings.py:
+To fix the brute force vulnerability, the easiest way is to use a third party solution, like `django-axes`.
+```
+pip install django-axes
+```
+After installation, `django-axes` is configured in settings.py:
 ```
 # settings.py
 INSTALLED_APPS = [
     'axes',
 ]
+```
+- https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L41
+```
 MIDDLEWARE = [
     'axes.middleware.AxesMiddleware',
 ]
+```
+- https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L52
+```
 AUTHENTICATION_BACKENDS = [
     'axes.backends.AxesBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 AXES_FAILURE_LIMIT = 3 
 AXES_COOLOFF_TIME = 1
-```` 
+````
+- https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L108 <br>
 Finally, run `python manage.py migrate`.
 
 <br>
