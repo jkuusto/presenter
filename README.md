@@ -78,13 +78,13 @@ It is also good practice to add a CSRF token even to forms that do not require a
 
 ### FLAW 2: Injection
 #### Exact Source Link Pinpointing Flaw 2
-- https://github.com/jkuusto/presenter/blob/main/polls/views.py#L67
+- https://github.com/jkuusto/presenter/blob/main/polls/views.py#L65
 - https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L37
 
 #### Description of Flaw 2
-A threat actor can exploit unsanitized SQL handling to inject SQL statements via user forms. In other words, this vulnerability allows the attacker to execute arbitrary SQL commands by manipulating input data.
+A threat actor can exploit unsanitized SQL handling to inject and execute SQL statements via user forms.
 
-Example: The threat actor types SQL values in the Add New Choice form on a poll detail page to create a choice while setting an arbitrary vote count. The following injection payload would create a choice "A thousand votes" and set its vote count to 1000:
+Example: The threat actor types SQL values in the "Add New Choice" form on a poll detail page to create a choice while setting an arbitrary vote count. The following injection payload would create a choice "A thousand votes" and set its vote count to 1000:
 ```
 A thousand votes', 1000); --
 ```
@@ -102,7 +102,7 @@ def post(self, request, *args, **kwargs):
         return redirect('polls:detail', pk=self.get_object().pk)
     return render(request, self.template_name, {'form': form, 'question': self.get_object()})
 ```
-- https://github.com/jkuusto/presenter/blob/main/polls/views.py#L70
+- https://github.com/jkuusto/presenter/blob/main/polls/views.py#L71
 2. Use Django Forms for input Handling.<br>
 In detail.html, instead of the default html form, use `{{ form.as_p }}` to enable Django's form rendering which provides built-in protection against SQL injection.
 ```
@@ -118,7 +118,7 @@ In detail.html, instead of the default html form, use `{{ form.as_p }}` to enabl
 
 ### FLAW 3: Cross-Site Scripting (XSS)
 #### Exact Source Link Pinpointing Flaw 3
-- https://github.com/jkuusto/presenter/blob/main/polls/views.py#L158
+- https://github.com/jkuusto/presenter/blob/main/polls/views.py#L157
 - https://github.com/jkuusto/presenter/blob/main/polls/templates/polls/detail.html#L49
 
 #### Description of Flaw 3
@@ -134,11 +134,9 @@ Example 2: Instead of rendering the page normally, render only a h1 header claim
 ```
 #### How to Fix It
 1. Escape characters when adding comments. <br>
-Add `comment.comment_text = escape(comment.comment_text)` to the add_comment function. This ensures that the user content is escaped properly when stored in the database however it may be rendered later.
-
-- https://github.com/jkuusto/presenter/blob/main/polls/views.py#L157
+Add `comment.comment_text = escape(comment.comment_text)` to the add_comment function (see source link above). This ensures that the user content is escaped properly when stored in the database however it may be rendered later.
 2. Escape characters when rendering comments. <br>
-Remove the `|safe` filter when rendering comments. This enables Django's built-in backend mechanisms to ensure that user-generated content is properly escaped when rendered:
+Remove the `|safe` filter when rendering comments. This enables Django's built-in mechanisms to ensure that user-generated content is properly escaped when rendered:
 ```
 <!-- detail.html -->
 <ul>
@@ -155,21 +153,21 @@ Remove the `|safe` filter when rendering comments. This enables Django's built-i
 #### Exact Source Link Pinpointing Flaw 4
 - https://github.com/jkuusto/presenter/blob/main/presenter/settings.py#L91
 #### Description of Flaw 4
-Main flaw: There are no requirements for password creation, allowing weak passwords to be set by users. A user could set their password even as just "1" during registration on the auth page, which is very easy to guess or discover by brute force.
+The main flaw is that there are no requirements for password creation, allowing weak passwords to be set by users. A user could set their password even as just "1" during registration on the auth page, which is very easy to guess.
 
-Another interesting issue is that by default Django apps do not lock out users from trying to brute force login credentials. That is also the case in this app.
+An extra issue is that by default Django apps do not lock out attackers from trying to brute force login credentials. That is also the case in this app.
 #### How to Fix It
 To fix the weak password policy, use the validators.py file with a custom password validator that requires passwords to include at least one lower case letter, one upper case letter, one digit, and one symbol.
 - https://github.com/jkuusto/presenter/blob/main/polls/validators.py#L1
 
 Then set password requirements for password creation in settings.py (see source link from before).
 
-The three other settings assert these additional requirements for passwords:
+The three other settings added in AUTH_PASSWORD_VALIDATORS assert additional requirements for passwords:
 - Prevent passwords that are similiar to the username or email address
 - Set a minimum length for passwords (14 in this case)
 - Prevent using the most common passwords that are easy to guess
 
-As an additional measure, the easiest way to fix the brute force vulnerability is to use a third party solution, like `django-axes`.
+As an additional measure, the brute force vulnerability can be fixed. The easiest way to do this is to use a third party solution, like `django-axes`.
 ```
 pip install django-axes
 ```
@@ -184,11 +182,11 @@ Finally, run `python manage.py migrate`.
 
 ### FLAW 5: Broken Access Control
 #### Exact Source Link Pinpointing Flaw 5
-- https://github.com/jkuusto/presenter/blob/main/polls/views.py#L77
+- https://github.com/jkuusto/presenter/blob/main/polls/views.py#L78
 #### Description of Flaw 5
-The design of the app dictates that only logged-in users can vote and view the vote results. After an authenticated user has voted, they are automatically redirected to the poll question's results page. There is no direct navigational link to view the results without voting.
+The design logic of the app dictates that only logged-in users can vote and therefore view the vote results: After an authenticated user has voted, they are automatically redirected to the poll question's results page. There is no direct navigational link to view the results without voting.
 
-However, due to a Broken Access Control vulnerability, specifically an Insecure Direct Object References (IDOR) flaw, an anonymous user can access the results page by manipulating the URL directly in the browser's address bar. For example, to access the results of poll question id 1, one could go directly to `/polls/1/results/`. This way, the link can also be shared on a public forum exposing poll data that is meant to be seen only by authorized users.
+However, due to a Broken Access Control vulnerability, an anonymous user can access the results page by manipulating the URL directly in the browser's address bar. For example, to access the results of poll question id 1, one could go directly to `/polls/1/results/`. This way, the link can also be shared publically exposing poll data that is meant to be seen only by authorized users.
 #### How to Fix It
-Add a `@method_decorator(login_required, name='dispatch')` decorator to the ResultsView class in views.py (see source code link above). This ensures that access to each results view is granted only when a user is logged in, fixing the broken access control flaw.
+Add a `@method_decorator(login_required, name='dispatch')` decorator to the ResultsView class in views.py (see source link above). This ensures that access to each results view is granted only when a user is logged in, fixing the broken access control flaw.
 
